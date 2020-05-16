@@ -1,7 +1,30 @@
-var Book = require('../models/book');
+const Book = require('../models/book');
+const BookInstance = require('../models/bookinstance');
+const Author = require('../models/author');
+const Genre = require('../models/genre');
+
+const async = require('async')
 
 exports.index = function(req, res) {
-    res.send('NOT IMPLEMENTED: Site Home Page');
+    async.parallel({
+        book_count: function(cb) {
+            Book.countDocuments({}, cb)
+        },
+        book_instance_count: function(cb) {
+            BookInstance.countDocuments({}, cb)
+        },
+        book_instance_available_count: function(cb) {
+            BookInstance.countDocuments({status: 'Available'}, cb)
+        },
+        author_count: function(cb) {
+            Author.countDocuments({}, cb)
+        },
+        genre_count: function(cb) {
+            Genre.countDocuments({}, cb)
+        }
+    }, function (err, results) {
+        res.render('index', {title: "My express Library", error: err, data: results});
+    });
 };
 
 // Display list of all books.

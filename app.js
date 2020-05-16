@@ -17,6 +17,9 @@ var mongoDbUrl = 'mongodb+srv://elew:4ZjRG-ZnySUJUjU@cluster0-am2zx.mongodb.net/
 mongoose.connect(mongoDbUrl, { useNewUrlParser: true });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.once('open', function() {
+  console.log("Successfully connected to db")
+});
 
 
 // view engine setup
