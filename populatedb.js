@@ -4,6 +4,7 @@ console.log('This script populates some test books, authors, genres and bookinst
 
 // Get arguments passed on command line
 var userArgs = process.argv.slice(2);
+console.log(userArgs)
 /*
 if (!userArgs[0].startsWith('mongodb')) {
     console.log('ERROR: You need to specify a valid mongodb URL as the first argument');
@@ -82,7 +83,6 @@ function bookCreate(title, summary, isbn, author, genre, cb) {
   }  );
 }
 
-
 function bookInstanceCreate(book, imprint, due_back, status, cb) {
   bookinstancedetail = { 
     book: book,
@@ -103,7 +103,6 @@ function bookInstanceCreate(book, imprint, due_back, status, cb) {
     cb(null, book)
   }  );
 }
-
 
 function createGenreAuthors(cb) {
     async.series([
@@ -136,7 +135,6 @@ function createGenreAuthors(cb) {
         cb);
 }
 
-
 function createBooks(cb) {
     async.parallel([
         function(callback) {
@@ -164,7 +162,6 @@ function createBooks(cb) {
         // optional callback
         cb);
 }
-
 
 function createBookInstances(cb) {
     async.parallel([
@@ -206,8 +203,6 @@ function createBookInstances(cb) {
         cb);
 }
 
-
-
 async.series([
     createGenreAuthors,
     createBooks,
@@ -225,6 +220,4 @@ function(err, results) {
     // All done, disconnect from database
     mongoose.connection.close();
 });
-
-
 
