@@ -21,7 +21,7 @@ AuthorSchema
         }
         return str
     }
-    return sanitize(first_name) + " " + sanitize(family_name)
+    return sanitize(this.first_name) + " " + sanitize(this.family_name)
 })
 
 // Virtual for author's lifespan

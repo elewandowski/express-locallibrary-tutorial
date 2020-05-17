@@ -1,0 +1,14 @@
+extends layout
+
+block content
+    h1= title
+
+    ul
+        li #[bold Author:] #{author}
+        li #[bold Title:] #{title}
+        li #[bold Summary:] #{summary}
+        li #[bold ISBN:] #{isbn}
+        li #[bold Genres:]
+        ul 
+            each val in genre
+                li #{val.name}
