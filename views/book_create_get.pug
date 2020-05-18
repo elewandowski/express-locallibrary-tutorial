@@ -8,15 +8,31 @@ block content
             label(for='title') Title
             input(
                 type='text'
-                id='name'
+                id='title'
                 name='title'
             )
         div(class='form-element')
             label(for='author') Author
             select(
+                id='author'
                 name='author'
             )
                 each val in authors
+                    option= val.name
+        div(class='form-element')
+            label(for='summary') Summary
+            input(
+                type='text'
+                id='summary'
+                name='summary'
+            )
+        div(class='form-element')
+            label(for='genre') Genre
+            select(
+                id='genre'
+                name='genre'
+            )
+                each val in genres
                     option= val.name
         div(class='form-element')
             label(for='isbn') ISBN

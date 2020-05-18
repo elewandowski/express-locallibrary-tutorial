@@ -28,22 +28,21 @@ exports.index = function(req, res) {
 };
 
 // Display list of all books.
-exports.book_list = function(req, res) {
+exports.book_list = function(req, res, next) {
     Book.find({}, 'title author')
         .populate('author')
         .exec(function (err, list_books) {
-            if (err) { return next(err); }
+            if (err) next(err);
             res.render('book_list', { title: 'Book List', book_list: list_books });
           });
 };
 
 // Display detail page for a specific book.
-exports.book_detail = function(req, res) {
+exports.book_detail = function(req, res, next) {
     Book.findById({_id: req.params.id})
         .populate('genre')
         .exec(function (err, data) {
-            console.log(data);
-            
+            if (err.name === "CastError") res.send(`No book found with ID '${req.params.id}'`)
             if (err) next(err)
             res.render('book', data);
     })
@@ -74,15 +73,28 @@ exports.book_create_post = function(req, res) {
     /**
      *     title: {type: String, required: true},
             author: {type: Schema.Types.ObjectId, ref: 'Author', required: true},
+            genre: [{type: Schema.Types.ObjectId, ref: 'Genre'}]
             summary: {type: String, required: true},
             isbn: {type: String, required: true},
-            genre: [{type: Schema.Types.ObjectId, ref: 'Genre'}]
      */
 
-    Book.create({})
     console.log(req.body);
+
+    Book.create({
+        title: req.body.title,
+        author: req.body.author,
+        summary: req.body.summary,
+        genre: req.body.genre,
+        isbn: req.body.isbn,
+    }, (err, result) => {
+        console.log(err);
+        
+        if(err) next(err)
+        res.render('book_create_post', result);
+    })
     
-    res.render('book_create_post', {book: req.body});
+    
+    
 };
 
 // Display book delete form on GET.
