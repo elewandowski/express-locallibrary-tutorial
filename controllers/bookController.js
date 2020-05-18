@@ -51,12 +51,38 @@ exports.book_detail = function(req, res) {
 
 // Display book create form on GET.
 exports.book_create_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book create GET');
+    async.parallel({
+        authors: cb => Author.find({}, cb),
+        genres: cb => Genre.find({}, cb)
+    }, function(err, results) {
+        if(err) next(err)
+        res.render('book_create_get', {
+            title: "Create a book",
+            authors: results.authors,
+            genres: results.genres
+        })
+    })
 };
 
 // Handle book create on POST.
 exports.book_create_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book create POST');
+    // check if entry already exists
+        // check if isbn exists
+        // Book.exists()
+    console.log();
+    
+    /**
+     *     title: {type: String, required: true},
+            author: {type: Schema.Types.ObjectId, ref: 'Author', required: true},
+            summary: {type: String, required: true},
+            isbn: {type: String, required: true},
+            genre: [{type: Schema.Types.ObjectId, ref: 'Genre'}]
+     */
+
+    Book.create({})
+    console.log(req.body);
+    
+    res.render('book_create_post', {book: req.body});
 };
 
 // Display book delete form on GET.

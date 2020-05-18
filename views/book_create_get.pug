@@ -1,0 +1,28 @@
+extends layout
+
+block content
+    h1=title
+
+    form(action='/catalog/book/create' method='post')
+        div(class='form-element')
+            label(for='title') Title
+            input(
+                type='text'
+                id='name'
+                name='title'
+            )
+        div(class='form-element')
+            label(for='author') Author
+            select(
+                name='author'
+            )
+                each val in authors
+                    option= val.name
+        div(class='form-element')
+            label(for='isbn') ISBN
+            input(type='text' name='isbn')
+        div(class='form-element')
+            input(
+                type='submit'
+                url='/book/create'
+            )
