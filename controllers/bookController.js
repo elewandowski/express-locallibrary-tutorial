@@ -49,7 +49,7 @@ exports.book_detail = function(req, res, next) {
 };
 
 // Display book create form on GET.
-exports.book_create_get = function(req, res) {
+exports.book_create_get = function(req, res, next) {
     async.parallel({
         authors: cb => Author.find({}, cb),
         genres: cb => Genre.find({}, cb)
@@ -64,21 +64,10 @@ exports.book_create_get = function(req, res) {
 };
 
 // Handle book create on POST.
-exports.book_create_post = function(req, res) {
+exports.book_create_post = function(req, res, next) {
     // check if entry already exists
         // check if isbn exists
         // Book.exists()
-    console.log();
-    
-    /**
-     *     title: {type: String, required: true},
-            author: {type: Schema.Types.ObjectId, ref: 'Author', required: true},
-            genre: [{type: Schema.Types.ObjectId, ref: 'Genre'}]
-            summary: {type: String, required: true},
-            isbn: {type: String, required: true},
-     */
-
-    console.log(req.body);
 
     Book.create({
         title: req.body.title,

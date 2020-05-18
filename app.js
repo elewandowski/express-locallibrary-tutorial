@@ -9,11 +9,13 @@ var usersRouter = require('./routes/users');
 var wikiRouter = require('./routes/wiki');
 var catalogRouter = require('./routes/catalog');
 
+
+const secrets = require('./secrets')
 var app = express();
 
 //Set up mongoose connection
 var mongoose = require('mongoose');
-var mongoDbUrl = 'mongodb+srv://elew:4ZjRG-ZnySUJUjU@cluster0-am2zx.mongodb.net/test?retryWrites=true&w=majority';
+var mongoDbUrl = `mongodb+srv://elew:${secrets.mongoDbPassword}@cluster0-am2zx.mongodb.net/test?retryWrites=true&w=majority`;
 mongoose.connect(mongoDbUrl, { useNewUrlParser: true });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));

@@ -18,7 +18,7 @@ block content
                 name='author'
             )
                 each val in authors
-                    option= val.name
+                    option(value=val.id)= val.name
         div(class='form-element')
             label(for='summary') Summary
             input(
@@ -33,7 +33,7 @@ block content
                 name='genre'
             )
                 each val in genres
-                    option= val.name
+                    option(value=val.id)= val.name
         div(class='form-element')
             label(for='isbn') ISBN
             input(type='text' name='isbn')
