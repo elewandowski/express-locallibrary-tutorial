@@ -1,0 +1,7 @@
+extends layout
+
+block content
+    if author
+        p A book already exists with the #{key}: #{value} and author: #{author}. Duplicate copies are not allowed.
+    else 
+        p A book already exists with the #{key}: #{value}. Duplicate copies are not allowed.

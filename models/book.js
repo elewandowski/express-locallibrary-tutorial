@@ -7,7 +7,7 @@ var BookSchema = new Schema(
     title: {type: String, required: true},
     author: {type: Schema.Types.ObjectId, ref: 'Author', required: true},
     summary: {type: String, required: true},
-    isbn: {type: String, required: true},
+    isbn: {type: String, required: true}, //TODO make unique
     genre: [{type: Schema.Types.ObjectId, ref: 'Genre'}]
   }
 );

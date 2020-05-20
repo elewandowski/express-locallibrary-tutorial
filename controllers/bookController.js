@@ -64,26 +64,49 @@ exports.book_create_get = function(req, res, next) {
 };
 
 // Handle book create on POST.
-exports.book_create_post = function(req, res, next) {
-    // check if entry already exists
-        // check if isbn exists
-        // Book.exists()
+exports.book_create_post = async function(req, res, next) {
+    function checkIfExists(book) {
+        // TODO make db requests in series, and escaping, as soon as match is found
+        return async.parallel([
+            (cb) => 
+                Book.findOne({ title: book.title, author: book.author })
+                    .populate('author')
+                    .exec((err, data) => {
+                        if (data) err = false; // break parallel control structure, if data found
+                        cb(err, data ? {
+                            key: 'title',
+                            value: data.title,
+                            author: data.author.name
+                        } : null);
+                    })
+            ,
+            (cb) => 
+                Book.findOne({ isbn: book.isbn })
+                    .exec((err, data) => {
+                        if (data) err = false;
+                        return cb(err, data ? {
+                            key: 'isbn',
+                            value: data.isbn
+                         } : null);
+                    })
+        ]) 
+    }
 
-    Book.create({
-        title: req.body.title,
-        author: req.body.author,
-        summary: req.body.summary,
-        genre: req.body.genre,
-        isbn: req.body.isbn,
-    }, (err, result) => {
-        console.log(err);
-        
-        if(err) next(err)
-        res.render('book_create_post', result);
-    })
-    
-    
-    
+    const bookAlreadyExists = await checkIfExists(req.body)
+    if (bookAlreadyExists) {
+        res.render('book_create_already_exists', bookAlreadyExists)
+    } else {
+        Book.create({
+            title: req.body.title,
+            author: req.body.author,
+            summary: req.body.summary,
+            genre: req.body.genre,
+            isbn: req.body.isbn,
+        }, (err, result) => {        
+            if(err) next(err)
+            res.render('book_create_post', result);
+        })    
+    }
 };
 
 // Display book delete form on GET.

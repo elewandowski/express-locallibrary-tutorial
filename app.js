@@ -16,7 +16,7 @@ var app = express();
 //Set up mongoose connection
 var mongoose = require('mongoose');
 var mongoDbUrl = `mongodb+srv://elew:${secrets.mongoDbPassword}@cluster0-am2zx.mongodb.net/test?retryWrites=true&w=majority`;
-mongoose.connect(mongoDbUrl, { useNewUrlParser: true });
+mongoose.connect(mongoDbUrl, { useNewUrlParser: true, useUnifiedTopology: true});
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', function() {
