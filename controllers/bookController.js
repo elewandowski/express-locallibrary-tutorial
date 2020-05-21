@@ -66,36 +66,44 @@ exports.book_create_get = function(req, res, next) {
 // Handle book create on POST.
 exports.book_create_post = async function(req, res, next) {
     function checkIfExists(book) {
-        // TODO make db requests in series, and escaping, as soon as match is found
-        return async.parallel([
-            (cb) => 
-                Book.findOne({ title: book.title, author: book.author })
-                    .populate('author')
-                    .exec((err, data) => {
-                        if (data) err = false; // break parallel control structure, if data found
-                        cb(err, data ? {
-                            key: 'title',
-                            value: data.title,
-                            author: data.author.name
-                        } : null);
-                    })
-            ,
-            (cb) => 
-                Book.findOne({ isbn: book.isbn })
-                    .exec((err, data) => {
-                        if (data) err = false;
-                        return cb(err, data ? {
-                            key: 'isbn',
-                            value: data.isbn
-                         } : null);
-                    })
-        ]) 
-    }
+        return async.tryEach([
+                (cb) => 
+                    Book.findOne({ title: book.title, author: book.author }) // turn into single query
+                        .populate('author')
+                        .exec((err, _data) => {
+                            console.log(!_data)
+                            if (err) return cb(err)
+                            if (!_data) return cb(new Error("no book with matching title and author found"))
 
-    const bookAlreadyExists = await checkIfExists(req.body)
+                            cb(null, {
+                                key: 'title',
+                                value: _data.title,
+                                author: _data.author.name
+                            })
+                        })
+                ,
+                (cb) => 
+                    Book.findOne({ isbn: book.isbn })
+                        .exec((err, _data) => {
+                            if (err) return cb(err)
+                            if (!_data) return cb(new Error("No book with matching ISBN found"))
+
+                            cb(null, {
+                                    key: 'isbn',
+                                    value: _data.isbn
+                                })
+                        })
+            ])
+    }
+    
+    const bookAlreadyExists = await checkIfExists(req.body).catch(e => {
+        if (e.message === "No book with matching ISBN found") return false
+        else next(e)
+    })
     if (bookAlreadyExists) {
         res.render('book_create_already_exists', bookAlreadyExists)
     } else {
+        console.warn("book being created")
         Book.create({
             title: req.body.title,
             author: req.body.author,
