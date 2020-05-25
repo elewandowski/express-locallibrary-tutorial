@@ -65,12 +65,6 @@ exports.book_create_get = function(req, res, next) {
 
 // Handle book create on POST.
 exports.book_create_post = async function(req, res, next) {
-    // validate fields
-
-    function validate(book) {
-
-    }
-
     function alreadyExists(book) {
         return async.tryEach([
                 (cb) => 
@@ -131,8 +125,8 @@ exports.book_create_post = async function(req, res, next) {
             })(book)
             res.render('book_create_post', renderData);
         }).catch((error) => {
-            // return array of readable error strings
             function simplifyErrors(errors) {
+                // this function returns an array of readable error strings
                 const simpleErrorsMap = {
                     "required": "is required",
                 }
@@ -148,7 +142,7 @@ exports.book_create_post = async function(req, res, next) {
                 res.render('book_create_validation_error', {errors: simplifiedErrors})
             }
             next(error)
-        }
+        })
     }
 };
 
