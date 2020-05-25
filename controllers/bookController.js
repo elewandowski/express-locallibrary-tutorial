@@ -65,13 +65,18 @@ exports.book_create_get = function(req, res, next) {
 
 // Handle book create on POST.
 exports.book_create_post = async function(req, res, next) {
-    function checkIfExists(book) {
+    // validate fields
+
+    function validate(book) {
+
+    }
+
+    function alreadyExists(book) {
         return async.tryEach([
                 (cb) => 
                     Book.findOne({ title: book.title, author: book.author }) // turn into single query
                         .populate('author')
                         .exec((err, _data) => {
-                            console.log(!_data)
                             if (err) return cb(err)
                             if (!_data) return cb(new Error("no book with matching title and author found"))
 
@@ -93,27 +98,57 @@ exports.book_create_post = async function(req, res, next) {
                                     value: _data.isbn
                                 })
                         })
-            ])
+            ]).catch(e => {
+                if (e.message === "No book with matching ISBN found") return false
+                else next(e)
+            })
     }
-    
-    const bookAlreadyExists = await checkIfExists(req.body).catch(e => {
-        if (e.message === "No book with matching ISBN found") return false
-        else next(e)
-    })
+
+    const bookAlreadyExists = await alreadyExists(req.body)
+
     if (bookAlreadyExists) {
         res.render('book_create_already_exists', bookAlreadyExists)
     } else {
-        console.warn("book being created")
-        Book.create({
+        await Book.create({
             title: req.body.title,
             author: req.body.author,
             summary: req.body.summary,
             genre: req.body.genre,
             isbn: req.body.isbn,
-        }, (err, result) => {        
-            if(err) next(err)
-            res.render('book_create_post', result);
-        })    
+        }).then(async (book) => {
+            book = await book.populate('author')
+                        .populate('genre')
+                        .execPopulate()
+            const renderData = (function(book){
+                const genres = book.genre.map(genre => genre.name);
+                return {
+                    title: book.title,
+                    author: book.author.name,
+                    summary: book.summary,
+                    isbn: book.isbn,
+                    genres: genres
+                }
+            })(book)
+            res.render('book_create_post', renderData);
+        }).catch((error) => {
+            // return array of readable error strings
+            function simplifyErrors(errors) {
+                const simpleErrorsMap = {
+                    "required": "is required",
+                }
+                return Object.entries(errors).map((val) => {
+                    const nameOfFieldWithError = val[0]
+                    const error = val[1].kind
+                    const readableError = simpleErrorsMap[error]
+                    return `${nameOfFieldWithError} ${readableError}`
+                })
+            }
+            if (error.name === "ValidationError") {
+                const simplifiedErrors = simplifyErrors(error.errors)
+                res.render('book_create_validation_error', {errors: simplifiedErrors})
+            }
+            next(error)
+        }
     }
 };
 

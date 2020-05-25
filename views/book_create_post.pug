@@ -7,5 +7,8 @@ block content
     p Title: #{title}
     p Author: #{author}
     p Summary: #{summary}
-    p Genre: #{genre}
+    p Genre/s:
+    ul
+        each genre in genres
+            li #{genre}
     p ISBN: #{isbn}
